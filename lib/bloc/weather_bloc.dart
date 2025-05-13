@@ -10,10 +10,11 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     on<WeatherFetched>((event, emit) async {
       emit(WeatherLoading());
       try {
-        final weather = await weatherRepository.getCurrentWeather();
+        final weather =
+            await weatherRepository.getCurrentWeather(event.cityName);
         emit(WeatherSuccess(weather));
       } catch (e) {
-        emit(WeatherFailure(e.toString()));
+        emit(WeatherFailure('An unexpected error occurred'));
       }
     });
   }
