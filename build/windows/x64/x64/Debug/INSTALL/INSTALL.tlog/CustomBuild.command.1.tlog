@@ -1,0 +1,10 @@
+^C:\USERS\SOWBA\WEATHER_APP\BUILD\WINDOWS\X64\CMAKEFILES\9548D1FB44C4E9A65EE3C5A06A99F82A\INSTALL_FORCE.RULE
+setlocal
+cd .
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

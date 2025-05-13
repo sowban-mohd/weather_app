@@ -1,0 +1,10 @@
+^C:\USERS\SOWBA\WEATHER_APP\BUILD\WINDOWS\X64\CMAKEFILES\9548D1FB44C4E9A65EE3C5A06A99F82A\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/sowba/weather_app/windows -BC:/Users/sowba/weather_app/build/windows/x64 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/sowba/weather_app/build/windows/x64/weather_app.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
