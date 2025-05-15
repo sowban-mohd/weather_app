@@ -1,11 +1,27 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_app/bloc/weather_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:weather_app/provider/weather_provider.dart';
 
-class WeatherScreen extends StatelessWidget {
-  const WeatherScreen({super.key});
+class WeatherScreen extends StatefulWidget {
+  final String cityName;
+  const WeatherScreen({super.key, required this.cityName});
+
+  @override
+  State<WeatherScreen> createState() => _WeatherScreenState();
+}
+
+class _WeatherScreenState extends State<WeatherScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the weather data when the screen is initialized
+   WidgetsBinding.instance.addPostFrameCallback((_) {
+    final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
+    weatherProvider.fetchWeather(widget.cityName);
+  });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +56,17 @@ class WeatherScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child:
-              BlocBuilder<WeatherBloc, WeatherState>(builder: (context, state) {
-            if (state is WeatherFailure) {
+          child: Consumer<WeatherProvider>(builder: (context, provider, child) {
+            final state = provider.status;
+            if (state == WeatherStatus.failure) {
               return Center(
                 child: Text(
-                  state.error,
+                  provider.errorMessage!,
                   style: const TextStyle(fontSize: 20, color: Colors.red),
                 ),
               );
             }
-            if (state is! WeatherSuccess) {
+            if (state != WeatherStatus.success) {
               return const Center(
                 child: CircularProgressIndicator(color: Colors.white),
               );
@@ -73,7 +89,7 @@ class WeatherScreen extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              '${state.weather.currentTemp} K',
+                              '${provider.weather!.currentTemp} K',
                               style: const TextStyle(
                                 fontSize: 42,
                                 fontWeight: FontWeight.bold,
@@ -82,8 +98,8 @@ class WeatherScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
                             Icon(
-                              state.weather.currentSky == 'Clouds' ||
-                                      state.weather.currentSky == 'Rain'
+                              provider.weather!.currentSky == 'Clouds' ||
+                                      provider.weather!.currentSky == 'Rain'
                                   ? Icons.cloud
                                   : Icons.wb_sunny,
                               size: 64,
@@ -91,7 +107,7 @@ class WeatherScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              state.weather.currentSky,
+                              provider.weather!.currentSky,
                               style: const TextStyle(
                                 fontSize: 20,
                                 color: Colors.white70,
@@ -119,9 +135,10 @@ class WeatherScreen extends StatelessWidget {
                     height: 100,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: state.weather.hourlyForecast.length,
+                      itemCount: provider.weather!.hourlyForecast.length,
                       itemBuilder: (context, index) {
-                        final forecast = state.weather.hourlyForecast[index];
+                        final forecast =
+                            provider.weather!.hourlyForecast[index];
                         return Container(
                           width: 80,
                           margin: const EdgeInsets.only(right: 12),
@@ -173,11 +190,11 @@ class WeatherScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _infoIcon(Icons.water_drop, "Humidity",
-                          state.weather.currentHumidity.toString()),
+                          provider.weather!.currentHumidity.toString()),
                       _infoIcon(Icons.air, "Wind",
-                          state.weather.currentWindSpeed.toString()),
+                          provider.weather!.currentWindSpeed.toString()),
                       _infoIcon(Icons.compress, "Pressure",
-                          state.weather.currentPressure.toString())
+                          provider.weather!.currentPressure.toString())
                     ],
                   ),
                 ],

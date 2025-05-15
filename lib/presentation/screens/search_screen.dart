@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:weather_app/bloc/weather_bloc.dart';
 import 'package:weather_app/presentation/screens/weather_screen.dart';
 
 class SearchScreen extends StatelessWidget {
@@ -28,9 +26,21 @@ class SearchScreen extends StatelessWidget {
         child: Center(
           child: TextField(
             onSubmitted: (text) {
-              BlocProvider.of<WeatherBloc>(context)
-                  .add(WeatherFetched(cityName: text.trim()));
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const WeatherScreen()));
+              if (text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      "Please enter a city name",
+                    ),
+                  ),
+                );
+                return;
+              }
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => WeatherScreen(
+                          cityName: _cityNameController.text.trim())));
             },
             style: const TextStyle(color: Colors.white),
             cursorColor: Colors.white,
